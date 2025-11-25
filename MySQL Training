@@ -1,0 +1,256 @@
+show databases;
+create database mphasis;
+use mphasis;
+create table collegues(
+	name varchar(15),
+    age int(4),
+    employee_no int primary key
+);
+insert into collegues values("Bhargav",24,2638);
+insert into collegues values("Jagan",22,2659);
+insert into collegues values("Akshay",23,2523);
+insert into collegues values("Joshwa",20,2621);
+select*from collegues;
+desc collegues;
+drop table collegues;
+create table emptable (empid numeric, empname varchar(25),deptname varchar(10),mobile long,location varchar(15));
+insert into emptable values(2660,"Anirudha",'Java',826603212,'Bengaluru');
+insert into emptable values(2635,"Bhargav",'Java',2345219,'Bengaluru');
+insert into emptable values(1235,"Jagan",'Java',265991489,'Bengaluru');
+insert into emptable values(7543,"Akshay",'Java',9076823,'Pune');
+insert into emptable values(2675,"Joshwa",'Java',8567621,'Pune');
+
+select* from emptable; 
+
+alter table emptable add constraint pk primary key (empid);
+set SQL_SAFE_UPDATES =0;
+delete from emptable where empid=2638;
+alter table emptable add column deptid numeric;
+update emptable set deptid = 1 where deptname ='Java';
+alter table emptable drop column deptname;
+alter table emptable drop column deptid;
+alter table emptable change empid employeeid numeric;
+alter table emptable modify mobile varchar(13) not null, modify empname varchar(15) not null;
+alter table emptable add column empid numeric;
+alter table emptable add column age numeric;
+update emptable set empid = 2635 where empname = 'Bhargav';
+update emptable set age = 25 where empname = 'Bhargav';
+alter table emptable drop column employeeid;
+alter table emptable add column email varchar(25) unique;
+update emptable set email = 'akshaygmail' where empname = 'Akshay';
+
+desc emptable;
+
+create table dept (deptid numeric,deptname varchar(15), location varchar(20));
+insert into dept values (1,'Java','Bengaluru');
+alter table dept add constraint pk primary key (deptid);
+alter table dept add constraint FK_empdept foreign key(deptid) REFERENCES dept(deptid);
+select * from dept;
+
+
+create database class;
+use class;
+create table student (studid int(4), courseid numeric,studname varchar(25),coursename varchar(15));
+alter table student add column marks numeric;
+insert into student values(123,1,'Anirudha','Java',96);
+insert into student values(123,2,'Anirudha','Python',95);
+
+start transaction;
+insert into student values (156,3,'Jagan','Python',95);
+update student set coursename ='c' where courseid = 3;
+savepoint student_sp1;
+commit;
+
+set autocommit=0;
+
+alter table student add constraint spk primary key (studid,courseid);
+select * from student;
+
+create table student_2nf (studid numeric primary key,studname varchar(15));
+create table course_2nf (courseid numeric primary key, coursename varchar(15));
+create table student_course_2nf (studid numeric, courseid numeric , marks numeric);
+
+
+create database practice;
+use practice;
+create user 'anirudha@localhost' identified by 'anirudha@2025';
+grant all privileges on *.* to 'anirudha@localhost';
+revoke all privileges, grant option from 'anirudha@localhost';
+
+show tables;
+
+
+create table payments(upi_id int(10),name varchar(20),time varchar(20));
+select*from payments;
+ 
+start transaction;
+insert into payments values(111213,'jagan','2.30am');
+savepoint update1;
+ 
+insert into payments values(111983,'anirudha','7.30am');
+savepoint update2;
+ 
+update payments set name='bharghav' where upi_id='111983';
+savepoint update3;
+ 
+insert into payments values(111993,'Anirudha','7.50am');
+savepoint update4;
+delete from payments where upi_id = 111993;
+rollback to savepoint update1;
+commit;
+ 
+set autocommit=0;
+
+select substr('sql database program',3,4);
+
+create table student_tab(firstname varchar(15),lastname varchar(12), fullname varchar(50),stdid int primary key,marks double);
+insert into student_tab values("Dhananjay",'Raj',concat(firstname,' ',lastname),123,90.11),('Kanta','Kumar',concat(firstname,' ',lastname),342,89.42),
+('Shiva','Kumar',concat(firstname,' ',lastname),234,80.64),('Preethi','Harish',concat(firstname,' ',lastname),433,99.99),('Varsha','Naveen',concat(firstname,' ',lastname),673,98.19),
+('Umesh','Anuradha',concat(firstname,' ',lastname),144,-88.88),('Naveenesh', 'Natarajan',concat(firstname,' ',lastname), 908, 97.23);
+update student_tab set marks = 88.88 where stdid=144;
+ select * from student_tab;
+ select marks, round(marks) as roundmarks from student_tab;
+ drop table student_tab;
+select concat(firstname,' ',lastname) as fullname, marks, abs(marks) as ab_marks ,floor(marks) as fl_marks, ceil(marks) as ce_marks from student_tab; 
+select * from student_tab where fullname like 'varsha naveen';
+select * from student_tab limit 3 offset 3;
+
+
+select datediff('2025-11-18','2003-07-08') as age;
+select timestampdiff(month,'2003-07-08',curdate()) as age;
+select sum(marks) from student_tab;
+select sum(distinct(marks)) from student_tab;
+select marks ,if (abs(marks) >=37,'Pass','Fail') as result from student_tab;
+
+select concat(firstname,' ',lastname) as fullname,marks, case
+when abs(marks)>=60 then 'A'
+when abs(marks)>=40 and abs(marks)<60 then 'B'
+when abs(marks)>=35 and abs(marks)<40 then 'C'
+else 'Fail' end as grade from student_tab;
+
+
+
+select email, instr(email,'@') as indexval from emptable;
+select empname , reverse (empname) as domain_name from emptable;
+select empname, lpad(empname,15,'*') as pad_empname from emptable;
+
+
+insert into customerstable values ('Rajeev','India');
+update customerstable set creditLine = '10%' where country = "Germany"  ;
+delete from products where orderdate <= '2005-01-01';
+update officetable set phonenumber = 42341442 where country = 'London';
+delete from products where orderid = null;
+
+create database joins;
+use joins;
+create table ordertab(ordid numeric,ordercost double,orddate date);
+create table prodtab (prodid numeric, prodname varchar(20),orderid numeric,nou numeric);
+insert into ordertab values (123,7000,'2020-08-23');
+
+/*Downloaded databases from net*/
+use classicmodels;
+select*from products;
+select*from  customers;
+select*from orderdetails;
+select*from  employees;
+select*from  offices;
+select*from  payments;
+
+select employeenumber,lastname from employees;
+show profiles;
+create index name_idx on employees(lastname);
+drop index name_idx on employees;
+
+select count(distinct(email)) from employees;
+create index composite_idx on employees (lastname, firstname);
+select employeenumber from employees where firstname = 'Gerard';
+
+create view mgr_view as select employeenumber,lastname from employees;
+select * from mgr_view;
+update mgr_view set lastname = 'Bonson' where employeenumber = 1102;
+
+delimiter $$
+create procedure retreiveEmp()
+begin
+	select * from employees;
+end $$
+call retreiveEmp();
+
+delimiter $$
+create procedure getAllProdNaByProdLine(in product varchar(50))
+begin
+select * from products where productline=product;
+end $$
+
+call getAllProdNaByProdLine('Motorcycles');
+
+-- increase given input value by 10 and print back --
+delimiter $$
+create procedure incValue1(inout Vl int)
+begin 
+set vl = vl+10;
+end $$
+
+set @v =5 ;
+call incValue1(@v);
+select @v;
+
+-- check wheather given employee has high salary or not if condition in procedure sal>60000 -- 
+delimiter $$
+create procedure checksal(in cn int)
+begin 
+	declare amt int;
+    select amount into amt from payments where customernumber=cn;
+	if amt>60000 then
+    select 'high salary' as result;
+    else select 'low salaray' as result;
+	end if;
+end $$
+
+call checksal(124);
+
+-- print grade of a student depending on marks --
+delimiter $$
+create procedure checkmarks(in mar int)
+begin 
+	declare mar int;
+    select marks into mar from student_table where marks = mar;
+    if mar>90 then
+    select 'A' as grade;
+    elseif mar>60 and mar<90 then
+    select 'B' as grade;
+    elseif mar>40 and mar<60 then
+    select 'C' as grade;
+    else select 'Fail' as grade;
+	end if;
+end $$
+
+
+
+delimiter $$
+create procedure printNums()
+begin
+declare i int default 1;
+while i <= 10 do 
+select i;
+set i=i+1;
+end while;
+end $$
+call printNums();
+
+delimiter $$
+create procedure printNums1()
+begin
+declare i int default 1;
+repeat 
+select i;
+set i=i+1;
+until i>10
+end repeat ;
+end $$
+call printNums1();
+
+create function getFullName(firstname varchar(20), lastname varchar(20))
+returns varchar(50)
+deterministic begin return concat(firstname ' ' lasstname);
+end$$
