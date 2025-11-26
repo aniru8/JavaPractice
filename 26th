@@ -1,0 +1,107 @@
+//Bridge Pattern
+interface TV {
+    void on();
+    void off();
+    void changeChannel(int number);
+}
+ 
+class SonyTV implements TV {
+    public void on() { System.out.println("Sony TV ON"); }
+    public void off() { System.out.println("Sony TV OFF"); }
+    public void changeChannel(int number) {
+        System.out.println("Sony TV Channel: " + number);
+    }
+}
+ 
+class SamsungTV implements TV {
+    public void on() { System.out.println("Samsung TV ON"); }
+    public void off() { System.out.println("Samsung TV OFF"); }
+    public void changeChannel(int number) {
+        System.out.println("Samsung TV Channel: " + number);
+    }
+}
+ 
+abstract class RemoteControl {
+    protected TV tv;
+ 
+    RemoteControl(TV tv) {
+        this.tv = tv;
+    }
+ 
+    abstract void on();
+    abstract void off();
+    abstract void setChannel(int number);
+}
+ 
+class BasicRemote extends RemoteControl {
+ 
+    BasicRemote(TV tv) {
+        super(tv);
+    }
+ 
+    void on() { tv.on(); }
+    void off() { tv.off(); }
+ 
+    void setChannel(int number) {
+        tv.changeChannel(number);
+    }
+}
+ 
+public class Main {
+    public static void main(String[] args) {
+        TV sony = new SonyTV();
+        RemoteControl remote = new BasicRemote(sony);
+ 
+        remote.on();
+        remote.setChannel(5);
+        remote.off();
+    }
+}  
+
+
+
+************************************************
+//Proxy Pattern
+
+public interface Payment {
+	public void pay(double amount);
+}
+//Real Class
+public class CashPayment implements Payment{
+
+	@Override
+	public void pay(double amount) {
+		System.out.println("Payment of amount "+amount+" completed. Thank you.");	
+	}
+}
+
+//Proxy classes
+public class UpiPayment implements Payment{
+	
+	private CashPayment cash=new CashPayment();
+	
+	@Override
+	public void pay(double amount) {
+		System.out.println("User validated");
+		System.out.println("Pin verified successfully");
+		System.out.println("Payment done");
+		cash.pay(amount);		
+	}
+}
+
+public class NetBanking implements Payment{
+	
+	private CashPayment cash=new CashPayment();
+	
+	@Override
+	public void pay(double amount) {
+		System.out.println("User credentials validated");
+		System.out.println("OTP verified successfully");
+		System.out.println("Payment done");
+		cash.pay(amount);		
+	}
+}
+
+***************************************************************
+https://techvidvan.com/tutorials/wp-content/uploads/sites/2/2020/03/collection-framework-hierarchy-in-java.jpg
+
