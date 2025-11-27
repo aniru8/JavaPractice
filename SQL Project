@@ -1,0 +1,92 @@
+create database  PowerConsumptionTracker;
+use PowerConsumptionTracker;
+
+create table Customer(CustomerId int Primary Key, Name varchar(20) Not Null, 
+Address varchar(50) Not Null, PhoneNumber varchar(10) Not Null, Email varchar(30) Unique);
+
+insert into Customer values(1, "Sanjay","Bengaluru","8982082523","sanjay@example.com"),
+						   (2, "Vibha","Pune","8123842940","vibha@example.com"),
+                           (3, "Ramesh","Bengaluru","9448926188","ramesh@example.com"),
+                           (4, "Janhavi","Hyderabad","9481486792","janhavi@example.com"),
+                           (5, "Prathap","Delhi","6874832914","prathap@example.com");
+                           
+
+create table Meter (MeterId int Primary Key, CustomerId int,
+InstallationDate Date Not Null, LastreadingDate Date Not Null,constraint CustomerId_fk foreign key(CustomerId) references Customer(CustomerId) on delete cascade);
+
+insert into Meter values(109,1, "2025-10-21","2025-11-20"),
+						(107,2, "2025-09-12","2025-10-11"),
+                        (298,3, "2024-07-11","2024-08-10"),
+                        (424,4, "2022-01-08","2022-02-07"),
+                        (296,5, "2023-09-12","2023-10-11");
+
+
+create table ElectricityUsage (UsageId int Primary Key, MeterId int, ReadingDate Date Not Null, UsageUnits Numeric check (UsageUnits>=0), 
+CONSTRAINT MeterId_fk FOREIGN KEY (MeterId) REFERENCES Meter(MeterId) ON DELETE CASCADE);
+
+insert into ElectricityUsage values (1,109,"2025-11-20",120),
+									(2,107,"2025-10-11",295),
+                                    (3,298,"2024-08-10",250),
+                                    (4,424,"2022-02-07",220),
+                                    (5,296,"2023-10-11",150);
+                                                                                
+
+create table Bill (BillId int primary key, MeterId int , BillDate date not null, AmountDue numeric(10,2) , DueDate date not null,
+Paid tinyint not null default 0, constraint Amountdue check (AmountDue >= 0), constraint Meter_fk foreign key (MeterId) references Meter(MeterId) on delete cascade);
+ 
+insert into Bill values (501,109,"2025-11-21",1500,"2025-12-05",0),
+						(502,107,"2025-10-12",1200,"2025-10-30",1),
+						(503,298,"2024-08-11",1800,"2024-08-25",0),
+						(504,424,"2022-02-08",2000,"2022-02-20",1),
+						(505,296,"2023-10-12",1300,"2023-10-28",0);   
+ 
+ 
+create table Payment(PaymentId int primary key, BillId int, PaymentDate date not null, AmountPaid numeric(10,2), constraint amountpaid check(AmountPaid >=0 ),
+constraint BillId_fk foreign key (BillId) references Bill(BillId) on delete cascade);
+
+insert into Payment values  (1001,502,"2025-10-15",1200),
+							(1002,504,"2022-02-15",2000),
+							(1003,501,"2025-11-25",1500),
+							(1004,503,"2024-08-20",1800),
+							(1005,505,"2023-10-20",1300);
+
+select*from Customer;
+select*from Meter;
+select*from ElectricityUsage;
+select*from Bill;
+select*from Payment;
+ 
+ 
+select MeterId, 
+    SUM(UsageUnits) AS TotalUsage
+from ElectricityUsage
+group by MeterId
+having SUM(UsageUnits) > 200;
+ 
+
+select c.CustomerId,c.Name,SUM(b.AmountDue) AS TotalUnpaidAmount
+from Customer c
+join Meter m on c.CustomerId = m.CustomerId
+join Bill b on m.MeterId = b.MeterId
+where b.Paid = 0
+group by c.CustomerId, c.name
+order by TotalUnpaidAmount desc;
+ 
+select b.BillId,b.MeterId,b.BillDate,b.AmountDue,b.DueDate,
+case when b.Paid = 1 
+then 'Paid'
+else 'Unpaid'
+    end as PaymentStatus
+from Bill b
+order by b.BillDate asc;
+
+ 
+select distinct c.CustomerId,c.name,c.Address,c.PhoneNumber,c.Email from Customer c
+join Meter m on c.CustomerId = m.CustomerId
+where m.InstallationDate > '2023-12-31';
+ 
+select m.MeterId,m.LastReadingDate,SUM(e.UsageUnits) as TotalUsage
+from Meter m
+join ElectricityUsage e on m.MeterId = e.MeterId
+group by m.MeterId, m.LastReadingDate
+order by TotalUsage desc;
